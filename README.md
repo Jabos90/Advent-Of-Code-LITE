@@ -12,12 +12,12 @@
 ### Project
  There are no particular requirements on the project itself, as long as all projects use the same .NET version.
  
- However, `DayBase.GetDate` assumes the project name ends with (at least) 2 numbers that it can use to determine which year is running.<br/>
+ However, [DayBase](https://github.com/Jabos90/Advent-Of-Code-LITE/blob/main/Common/DayBase.cs#L225) assumes the project name ends with (at least) 2 numbers that it can use to determine which year is running.<br/>
  Make the necessary changes there if you would like to use a different naming scheme.
 
 ### Program.cs (The Entry Point)
  Program.cs is the default entry point for a project, but it can be named whatever you want it to be.<br/>
- The main logic happens in `Common.Launcher`, so all the entry point needs to do is call it.
+ The main logic happens in the [Launcher](https://github.com/Jabos90/Advent-Of-Code-LITE/blob/main/Common/Launcher.cs#L16), so all the entry point needs to do is [call it](https://github.com/Jabos90/Advent-Of-Code-LITE/blob/main/AdventOfCode2015/Program.cs#L1).
 
  Calling the `Run()` method will attempt to run the task of whatever day the computer is set to (up to 25).<br/>
  To run a specific day, simply supply it as the parameter to the same method.
@@ -25,15 +25,15 @@
 ### Day
  The class containing the logic to solve the task(s) of a given day.
  
- They *must* be named `Day##` because that is the name that the launcher will look for when creating the instance.<br/>
- Also, DayBase assumes the class name ends with 2 numbers that it can use to determine which day is running.<br/>
+ They *must* be named `Day##` because that is the name that [the launcher will look for](https://github.com/Jabos90/Advent-Of-Code-LITE/blob/main/Common/Launcher.cs#L27) when creating the instance.<br/>
+ Also, [DayBase](https://github.com/Jabos90/Advent-Of-Code-LITE/blob/main/Common/DayBase.cs#L231) assumes the class name ends with 2 numbers that it can use to determine which day is running.<br/>
  Make the necessary changes there if you would like to use a different naming scheme.
 
- It is also required that the class inherits from DayBase, which will handle setup and teardown, and provides convenient methods for handling the answer.<br/>
- Visual Studio will prompt you to implement the abstract method `Run(string[] input)` which is where you put all the necessary code.
+ It is also required that the class inherits from DayBase, which will handle [setup and teardown](https://github.com/Jabos90/Advent-Of-Code-LITE/blob/main/Common/DayBase.cs#L26), and provides convenient methods for [handling the answer](https://github.com/Jabos90/Advent-Of-Code-LITE/blob/main/Common/DayBase.cs#L92).
+ Visual Studio will demand that you implement the abstract method [Run(string[] input)](https://github.com/Jabos90/Advent-Of-Code-LITE/blob/main/AdventOfCode2015/Day01.cs#L7) which is where you put all the necessary code.
 
 ### PrintResult
- This DayBase method will allow you to print the answer to the console with (optional) flavor text before and/or after it.<br/>
+ [PrintResult](https://github.com/Jabos90/Advent-Of-Code-LITE/blob/main/Common/DayBase.cs#L50) will allow you to print the answer to the console with (optional) flavor text [before](https://github.com/Jabos90/Advent-Of-Code-LITE/blob/main/Common/DayBase.cs#L60) and/or [after](https://github.com/Jabos90/Advent-Of-Code-LITE/blob/main/Common/DayBase.cs#L70) it.<br/>
  It will also save the answer in the correct location for automatic submission once execution has finished (presuming a SessionID has been provided).
 
  By default, the assumption is that the first call to this method is the answer to part 1, and the next is for part 2.<br/>
