@@ -15,7 +15,7 @@
  However, [DayBase](https://github.com/Jabos90/Advent-Of-Code-LITE/blob/main/Common/DayBase.cs#L225) assumes the project name ends with (at least) 2 numbers that it can use to determine which year is running.<br/>
  Make the necessary changes there if you would like to use a different naming scheme.
 
-### Program.cs (The Entry Point)
+### Program.cs
  Program.cs is the default entry point for a project, but it can be named whatever you want it to be.<br/>
  The main logic happens in the [Launcher](https://github.com/Jabos90/Advent-Of-Code-LITE/blob/main/Common/Launcher.cs#L16), so all the entry point needs to do is [call it](https://github.com/Jabos90/Advent-Of-Code-LITE/blob/main/AdventOfCode2015/Program.cs#L1).
 
