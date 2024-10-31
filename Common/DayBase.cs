@@ -138,8 +138,8 @@ public abstract class DayBase
         var content = $" {day} [{year}] ";
 
         // Construct the delimiter
-        var length = Console.BufferWidth / 2 - content.Length / 2;
-        var delimiter = new string('-', length);
+        var length = Console.BufferWidth / 2.0 - content.Length / 2.0;
+        var delimiter = new string('-', (int)length);
 
         // Print the header
         var header = $"{delimiter}{content}{delimiter}";
