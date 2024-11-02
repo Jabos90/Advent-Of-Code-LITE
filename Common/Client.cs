@@ -45,7 +45,8 @@ internal static partial class Client
         // Read Session ID
         _sessionPath = Path.GetFullPath(IDPath);
         if (!Path.Exists(_sessionPath) && !TryGetSessionID(_sessionPath)) return;
-        ReadFile(_sessionPath, out _sessionID);
+        ReadFile(_sessionPath, out var lines);
+        _sessionID = lines[0];
 
         // Initilize submission cache(s)
         _submissionCache = [];
@@ -289,11 +290,8 @@ internal static partial class Client
         var fullPath = Path.GetFullPath(localPath);
 
         if (File.Exists(fullPath))
-        {   // Input file found, read it
-            ReadFile(localPath, out var contents);
-            input = contents.Trim().Split('\n');
-            return true;
-        }
+            // Input file found, read it
+            return ReadFile(localPath, out input);
 
         $"Could not find {localPath}".WriteLine(Colors.Negative);
 
@@ -310,8 +308,7 @@ internal static partial class Client
                 "Download Complete!".WriteLine(Colors.Positive);
                 Console.WriteLine();
 
-                input = response.Trim().Split('\n');
-                return true;
+                return ReadFile(fullPath, out input);
             }
             catch (AggregateException ae)
             {   // Host returns 404 when task is not (yet) available
@@ -434,7 +431,8 @@ internal static partial class Client
                 // Could not find any previous submissions
                 return _submissionCache[id] = [];
 
-            ReadFile(path, out var contents);
+            ReadFile(path, out var lines);
+            var contents = string.Join(Environment.NewLine, lines);
             return _submissionCache[id] = JsonSerializer.Deserialize<Dictionary<string, SubmissionResponse>>(contents);
         }
     }
@@ -606,13 +604,19 @@ internal static partial class Client
     /// <param name="path">The path to the file</param>
     /// <param name="contents">The contents of the file</param>
     /// <returns>Whether or not the read was successful</returns>
-    public static bool ReadFile(string path, out string contents)
+    public static bool ReadFile(string path, out string[] contents)
     {
         try
         {
             using var fileStream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
             using var readStream = new StreamReader(fileStream);
-            contents = readStream.ReadToEnd();
+
+            string line;
+            var lines = new List<string>();
+            while ((line = readStream.ReadLine()) != null)
+                lines.Add(line);
+
+            contents = [.. lines];
             return true;
         }
         catch (Exception e)
@@ -620,7 +624,7 @@ internal static partial class Client
             IO.WriteError($"Could not open '{path}'", false);
             IO.WriteError(e.Message);
 
-            contents = string.Empty;
+            contents = [];
             return false;
         }
     }
