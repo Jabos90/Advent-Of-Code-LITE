@@ -47,8 +47,8 @@ public static class Launcher
         catch (Exception ex)
         {   // Something went wrong
             var message = ex.InnerException?.Message ?? ex.Message;
-            IO.WriteError(message);
-            return;
+            IO.WriteError(message + Environment.NewLine, false);
+            IO.WriteError(ex.StackTrace);
         }
     }
 }
