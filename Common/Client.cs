@@ -3,12 +3,13 @@ using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Common.Enums;
+using Common.Extensions;
 
 namespace Common;
 
 internal static partial class Client
 {
-    private const string IDPath = "..\\..\\..\\..\\SessionID";
+    private const string SessionIDFilename = "SessionID";
     private const string SubmissionsPath = "Submissions";
     private const string InputsPath = "Inputs";
 
@@ -42,8 +43,17 @@ internal static partial class Client
         var inputStream = Console.OpenStandardInput(inputBuffer.Length);
         Console.SetIn(new StreamReader(inputStream, Console.InputEncoding, false, inputBuffer.Length));
 
+        // Get path to solution root
+        if (!TryGetSolutionDirectory(out var solutionRoot))
+        {
+            IO.WriteError("Could not find the solution file, automatic features disabled", false);
+            Console.WriteLine();
+            Console.CursorTop++;
+            return;
+        }
+
         // Read Session ID
-        _sessionPath = Path.GetFullPath(IDPath);
+        _sessionPath = Path.Join(solutionRoot, SessionIDFilename);
         if (!Path.Exists(_sessionPath) && !TryGetSessionID(_sessionPath)) return;
         ReadFile(_sessionPath, out var lines);
         _sessionID = lines[0];
@@ -578,6 +588,20 @@ internal static partial class Client
         var baseURL = GetDayURL(year, day);
         using var client = new HttpClient(handler) { BaseAddress = new Uri(baseURL) };
         return method(client).Result;
+    }
+
+    /// <summary>
+    /// Explore each directory until the solution file is found
+    /// </summary>
+    /// <returns></returns>
+    private static bool TryGetSolutionDirectory(out string solutionDirectory)
+    {
+        var directory = new DirectoryInfo(Directory.GetCurrentDirectory());
+        while (directory != null && directory.GetFiles("*.sln").Length == 0)
+            directory = directory.Parent;
+
+        solutionDirectory = directory?.FullName;
+        return directory != null;
     }
 
     /// <summary>
