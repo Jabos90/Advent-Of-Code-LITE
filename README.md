@@ -1,5 +1,5 @@
 # Advent Of Code LITE
- A slice of my C# platform for automating away the busywork from Advent of Code
+ A slice of my C# platform for automating away the busywork from Advent of Code.
 
 ## Prerequisites
  * Visual Studio ([2022](https://visualstudio.microsoft.com/vs/))
@@ -7,7 +7,8 @@
 
 ## How to use
  Included in the repository are my solutions to the first 3 days of Advent of Code 2015.<br/>
- Hopefully, these examples are sufficient to explain the basic usage. If not, I've gone into more detail below:
+ Hopefully, these examples are sufficient to explain the basic usage. If not, I've gone into more detail below:</br>
+ ${\textsf{\color{red}Make sure you understand how PrintResult works}}$
 
 ### Project
  There are no particular requirements on the project itself, as long as all projects use the same .NET version.
