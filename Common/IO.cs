@@ -90,7 +90,7 @@ internal static class IO
     /// <param name="pause">Whether to pause execution until user confirms</param>
     public static void WriteError(this string error, bool pause = true)
     {
-        Write(error, Colors.Error);
+        WriteLine(error, Colors.Error);
         if (pause) Console.ReadLine();
     }
 

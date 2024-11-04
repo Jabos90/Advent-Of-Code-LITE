@@ -46,7 +46,6 @@ internal static partial class Client
         if (!TryGetSolutionDirectory(out var solutionRoot))
         {
             IO.WriteError("Could not find the solution file, automatic features disabled", false);
-            Console.WriteLine();
             Console.CursorTop++;
             return;
         }
@@ -54,7 +53,15 @@ internal static partial class Client
         // Read Session ID
         _sessionPath = Path.Join(solutionRoot, SessionIDFilename);
         if (!Path.Exists(_sessionPath) && !TryGetSessionID(_sessionPath)) return;
-        ReadFile(_sessionPath, out var lines);
+
+        if(!ReadFile(_sessionPath, out var lines))
+        {
+            Console.CursorTop--;
+            IO.WriteError("Automatic features disabled", false);
+            Console.CursorTop++;
+            return;
+        }
+
         _sessionID = lines[0];
 
         // Initilize submission cache(s)
@@ -342,7 +349,6 @@ internal static partial class Client
     private static bool TryGetSessionID(string path)
     {
         IO.WriteError($"Could not find session ID", false);
-        Console.WriteLine();
 
         // Instructions how to find Session ID
         IO.WriteLine($"1. Log in to {Host}", Colors.Neutral);
@@ -369,7 +375,6 @@ internal static partial class Client
         if (string.IsNullOrWhiteSpace(sessionID))
         {   // No session ID provided
             IO.WriteError("No valid session ID provided, automatic features disabled", false);
-            Console.WriteLine();
             Console.CursorTop++;
             return false;
         }
@@ -382,10 +387,11 @@ internal static partial class Client
         if (sessionID.Length != SessionIDLength)
             // Warn that the session ID is not the expected length
             IO.WriteError($" ID length is not {SessionIDLength}; might not work properly", false);
+        else
+            Console.WriteLine();
 
         // Create session ID file
         File.WriteAllText(path, sessionID);
-        Console.WriteLine();
         Console.CursorTop++;
         return true;
     }
@@ -646,7 +652,6 @@ internal static partial class Client
         {
             IO.WriteError($"Could not open '{path}'", false);
             IO.WriteError(e.Message);
-
             contents = [];
             return false;
         }
