@@ -1,8 +1,8 @@
-﻿using System.Net;
+﻿using Common.Enums;
+using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using Common.Enums;
 
 namespace Common;
 
@@ -54,7 +54,7 @@ internal static partial class Client
         _sessionPath = Path.Join(solutionRoot, SessionIDFilename);
         if (!Path.Exists(_sessionPath) && !TryGetSessionID(_sessionPath)) return;
 
-        if(!ReadFile(_sessionPath, out var lines))
+        if (!ReadFile(_sessionPath, out var lines))
         {
             Console.CursorTop--;
             IO.WriteError("Automatic features disabled", false);
@@ -411,13 +411,13 @@ internal static partial class Client
             return true;
 
         var (lower, upper) = GetBounds(id, submissions);
-        if (!string.IsNullOrWhiteSpace(lower) && answer.CompareTo(lower) < 0)
+        if (!string.IsNullOrWhiteSpace(lower) && Compare(answer, lower) < 0)
         {   // The answer if less than the known lower bound
             SaveResponse(id, answer, response = SubmissionResponse.TooLow);
             return true;
         }
 
-        if (!string.IsNullOrWhiteSpace(upper) && answer.CompareTo(upper) > 0)
+        if (!string.IsNullOrWhiteSpace(upper) && Compare(answer, upper) > 0)
         {   // The answer is more than the known upper bound
             SaveResponse(id, answer, response = SubmissionResponse.TooHigh);
             return true;
@@ -468,12 +468,12 @@ internal static partial class Client
             // Check what the highest seen "Too Low" submission is, if any
             string lower = null;
             var tooLow = submissions.Where(s => s.Value == SubmissionResponse.TooLow);
-            if (tooLow.Any()) lower = tooLow.Max(s => s.Key);
+            if (tooLow.Any()) lower = Equalize(tooLow.Select(v => v.Key)).Max();
 
             // Check what the lowest seen "Too High" submission is, if any
             string upper = null;
             var tooHigh = submissions.Where(s => s.Value == SubmissionResponse.TooHigh);
-            if (tooHigh.Any()) upper = tooHigh.Min(s => s.Key);
+            if (tooHigh.Any()) upper = Equalize(tooHigh.Select(v => v.Key)).Min();
 
             return _submissionBounds[id] = (lower, upper);
         }
@@ -668,6 +668,42 @@ internal static partial class Client
         Directory.CreateDirectory(directory);
         File.WriteAllText(path, contents);
     }
+
+    /// <summary>
+    /// Compare the answer with given boundary value
+    /// </summary>
+    /// <param name="answer">The answer to compare</param>
+    /// <param name="boundary">The boundary to compare against</param>
+    /// <returns>
+    /// Less than zero - This instance preceeds boundary</br>
+    /// Zero - This instance has the same position in the sort order as boundary</br>
+    /// Greater than zero - This instance follows boundary</returns>
+    private static int Compare(string answer, string boundary)
+    {
+        answer = PadZeroes(answer, boundary.Length);
+        boundary = PadZeroes(boundary, answer.Length);
+        return answer.CompareTo(boundary);
+    }
+
+    /// <summary>
+    /// Equalize the length of values by padding with zeroes
+    /// </summary>
+    /// <param name="values">The values to equalize</param>
+    /// <returns>An enumerable where the length of all items are equal</returns>
+    private static IEnumerable<string> Equalize(IEnumerable<string> values)
+    {
+        var length = values.Max(v => v.Length);
+        return values.Select(v => PadZeroes(v, length));
+    }
+
+    /// <summary>
+    /// Pad the given string with zeroes until it reaches specified length
+    /// </summary>
+    /// <param name="value">The value to pad</param>
+    /// <param name="length">The target length</param>
+    /// <returns>The given string, padded to the specified length</returns>
+    private static string PadZeroes(string value, int length) =>
+        value.PadLeft(length, '0');
 
     private record ID(int Year, int Day);
 
